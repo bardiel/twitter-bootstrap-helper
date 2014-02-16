@@ -7,6 +7,8 @@ class TwitterBootstrapHelper extends AppHelper {
 		"TwitterBootstrap.BootstrapHtml",
 		"TwitterBootstrap.BootstrapForm"
 	);
+	
+	public $defaultPanelButtonSize = 'sm';
 
 	public function basic_input($field, $options = array()) {
 		return $this->BootstrapForm->basicInput($field, $options);
@@ -32,9 +34,9 @@ class TwitterBootstrapHelper extends AppHelper {
 		return $this->BootstrapForm->_handleInputAddon($options);
 	}
 
-	public function input_addon($content, $input, $type = "append") {
-		return $this->BootstrapForm->inputAddon($content, $input, $type);
-	}
+	//public function input_addon($content, $input, $type = "append") {
+	//	return $this->BootstrapForm->inputAddon($content, $input, $type);
+	//}
 
 	public function search($name = null, $options = array()) {
 		return $this->BootstrapForm->search($name, $options);
@@ -60,40 +62,40 @@ class TwitterBootstrapHelper extends AppHelper {
 		return $this->BootstrapForm->button($value, $options);
 	}
 
-	public function button_dropdown($value = "", $options = array()) {
-		return $this->BootstrapHtml->buttonDropdown($value, $options);
+	public function button_dropdown($options = array()) {
+		return $this->BootstrapHtml->buttonDropdown($options);
 	}
 
-	public function button_link($title, $url, $opt = array(), $confirm = false) {
-		return $this->BootstrapHtml->buttonLink($title, $url, $opt, $confirm);
+	public function button_link($title, $url = null, $opt = array(), $confirm = false, $type = 'link') {
+		if(is_array($title) && isset($title['post']) || isset($title['link'])) {
+			return $this->BootstrapHtml->_buttonFromArray($title);
+		} else {
+			return $this->BootstrapHtml->_buttonFromArray(array($title, $url, $opt, $confirm, $type));
+		}
 	}
 
-	public function button_form($title, $url, $opt = array(), $confirm = false) {
-		return $this->BootstrapForm->buttonForm($title, $url, $opt, $confirm);
-	}
+	public function breadcrumbs($breadcrumbs = array()) {
+		if(empty($breadcrumbs)) return null;
 
-	public function button_options($options) {
-		return $this->BootstrapForm->buttonOptions($options);
-	}
+		foreach ($breadcrumbs as $item) {
+			$item = $this->BootstrapHtml->_parseLinkArray($item);
+			$item[2]['escape'] = false;
+		    $this->BootstrapHtml->Html->addCrumb($item[0], $item[1], $item[2]);
+		}
 
-	public function breadcrumbs($options = array()) {
-		return $this->BootstrapHtml->breadcrumbs($options);
-	}
-
-	public function add_crumb($title, $url, $options = array()) {
-		return $this->BootstrapHtml->addCrumb($title, $url, $options);
+		return $this->BootstrapHtml->breadcrumbs();
 	}
 
 	public function label($message = "", $style = "", $options = array()) {
 		return $this->Bootstrap->label($message, $style, $options);
 	}
 
-	public function badge($num = 0, $style = "", $options = array()) {
-		return $this->Bootstrap->badge($num, $style, $options);
+	public function badge($title = '0', $options = array()) {
+		return $this->Bootstrap->badge($title, $options);
 	}
 
-	public function icon($name, $color = "black") {
-		return $this->Bootstrap->icon($name, $color);
+	public function icon($name, $options = array()) {
+		return $this->Bootstrap->icon($name, $options);
 	}
 
 	public function progress($options = array()) {
@@ -108,20 +110,39 @@ class TwitterBootstrapHelper extends AppHelper {
 		return $this->Bootstrap->flash($key, $options);
 	}
 
-	public function flashes($options = array()) {
-		return $this->Bootstrap->flashes($options);
-	}
-
 	public function _flash_content($key = "flash") {
 		return $this->Bootstrap->_flash_content($key);
 	}
 
-	public function block($message = null, $options = array()) {
-		return $this->Bootstrap->block($message, $options);
+	public function page_header($title, $small = ""){
+		return $this->Bootstrap->pageHeader($title, $small);
 	}
-
-	public function page_header($title){
-		return $this->Bootstrap->pageHeader($title);
+	
+	public function start_panel($options = array()) {
+		return $this->BootstrapHtml->start_panel($options);
 	}
-
+	
+	public function start_panel_footer() {
+		return $this->BootstrapHtml->start_panel_footer();
+	}
+	
+	public function end_panel($options = array()) {
+		return $this->BootstrapHtml->end_panel($options);
+	}
+	
+	public function save_button() {
+		return $this->button($this->icon('ok-sign', 'white') . __('&nbsp;Guardar'), array('style' => 'success', 'size' => $this->defaultPanelButtonSize));
+	}
+	
+	public function navbar($options = array()) {
+		return $this->BootstrapHtml->navbar($options);
+	}
+	
+	public function formCreate($model = null, $options = array()) {
+		return $this->BootstrapForm->create($model, $options);
+	}
+	
+	public function nav($options = array()) {
+		 return $this->BootstrapHtml->nav($options);
+	}
 }
