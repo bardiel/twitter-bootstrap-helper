@@ -5,8 +5,13 @@ CakePHP helper for rendering Twitter Bootstrap appropriate markup.
 ## Requirements
 
 * [CakePHP 2.X](https://github.com/cakephp/cakephp)
+
+
 * [Twitter Bootstrap CSS 3.0.0](http://getbootstrap.com/)
-* *Optional* [Twitter Bootstrap JS](http://getbootstrap.com/)
+* [Twitter Bootstrap JS](http://getbootstrap.com/)
+* [Font Awesome 3.2.1](http://fontawesome.io/3.2.1/)
+
+All requirements (except CakePHP) included.
 
 ## WARNING
 
@@ -59,6 +64,30 @@ public $helpers = array(
     "className" => "TwitterBootstrap.TwitterBootstrap"
   )
 );
+```
+
+## Requirements Installation
+
+Simply copy `webroot`'s folder contents to app/webroot.
+
+Alternatively, if you're using a POSIX server, you may soft-link
+On your `app` folder:
+
+```
+$ ln -s Plugins/TwitterBootstrap/webroot/js/bootstrap.min.js webroot/js/
+$ ln -s Plugins/TwitterBootstrap/webroot/css/bootstrap.min.css webroot/css/
+$ ln -s Plugins/TwitterBootstrap/webroot/css/font-awesome.min.css webroot/css/
+$ ln -s $ ln -s Plugins/TwitterBootstrap/webroot/font webroot/
+```
+
+Then add the scripts and css to the Layout:
+
+```
+        echo $this->Html->css('bootstrap.min');
+        echo $this->Html->css('font-awesome.min');
+        echo $this->Html->css('custom');
+
+        echo $this->Html->script('bootstrap.min');
 ```
 
 ## Configuration arrays
