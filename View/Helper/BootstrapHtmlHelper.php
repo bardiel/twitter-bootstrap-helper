@@ -114,7 +114,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         /**
          * Panel Title
          */
-        if(isset($options['title'])) $title .= $options['title'];
+        if(isset($options['title'])) $title .= $this->Html->tag('strong', $options['title']);
         
         
         /**
