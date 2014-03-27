@@ -157,6 +157,7 @@ array(
 ### PANEL_ARRAY  
 ```
 array(
+    'id' => String, //panel div id 
     'icon' => ICON_ARRAY || Html,
     'title' => String,
     'style' => String, //Sets panel style. Default is 'default'. Valid are: 'default', 'primary', 'success', 'info', 'warning', 'danger'
