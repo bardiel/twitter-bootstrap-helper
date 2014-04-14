@@ -34,8 +34,9 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
             foreach($button[0] as $element => $config) {
                 switch($element) {
                     case 'icon':
+                        $name  = is_array($config) ? $config[0] : $config;
                         $style = isset($config[1]) ? $config[1] : array();
-                        $title .= $this->Bootstrap->icon($config[0], $style);
+                        $title .= $this->Bootstrap->icon($name, $style);
                         break;
                     case 'text':
                         $title .= ' '.$config;
