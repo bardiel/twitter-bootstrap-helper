@@ -116,7 +116,7 @@ There are two ways you can use LINK_ARRAYs. First one will output a `GET`:
 ```
 array(
     0 => array(
-        'icon' => ICON_ARRAY || Html, //Html = <i class="icon icon-nnnn"></i>
+        'icon' => ICON_ARRAY || String, //String will be the icon name (same as ICON_ARRAY[0]) 
         'text' => String,
         'label' => LABEL_ARRAY || Html, //Html = <span class="label label-nnnn">text</span>
     ),
