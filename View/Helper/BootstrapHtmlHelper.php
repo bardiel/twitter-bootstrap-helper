@@ -179,8 +179,11 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         return $html;
     }
     
-    public function start_panel_footer() {
-        return '</div><div class="panel-footer">';
+    public function start_panel_footer($options = array()) {
+        if(!isset($options['class'])) $options['class'] = '';
+
+        if(!strpos($options['class'], 'panel-footer')) $options['class'] .= ' panel-footer';
+        return "</div>" . $this->Html->tag('div', null, $options);
     }
     
     public function end_panel($options = array()){
