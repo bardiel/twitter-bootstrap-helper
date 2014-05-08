@@ -122,9 +122,8 @@ class TwitterBootstrapHelper extends AppHelper {
 		return $this->BootstrapHtml->start_panel($options);
 	}
 	
-	public function start_panel_footer() {
-		return $this->BootstrapHtml->start_panel_footer();
-	}
+	public function start_panel_footer($options = array()) {
+		return $this->BootstrapHtml->start_panel_footer($options);
 	
 	public function end_panel($options = array()) {
 		return $this->BootstrapHtml->end_panel($options);
