@@ -70,7 +70,6 @@ class TwitterBootstrapHelper extends AppHelper {
 		if(is_array($title) && isset($title['post']) || isset($title['link'])) {
 			return $this->BootstrapHtml->_buttonFromArray($title);
 		} else {
-			if(is_array($title)) return $this->BootstrapHtml->_buttonFromArray($title);
 			return $this->BootstrapHtml->_buttonFromArray(array($title, $url, $opt, $confirm, $type));
 		}
 	}
