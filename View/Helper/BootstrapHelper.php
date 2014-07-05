@@ -38,11 +38,18 @@ class BootstrapHelper extends AppHelper {
 	 * @access public
 	 * @return string
 	 */
-	public function label($message = "", $style = "default", $options = array()) {
-		$class = "label";
-		$valid_style = array("default", "primary", "success", "info", "warning", "danger");
-		
-		$class .= (in_array($style, $valid_style)) ? " label-{$style}" : " label-default";
+	public function label($message = "", $options = array()) {
+		$class 		= "label";
+		$valid_style= array("default", "primary", "success", "info", "warning", "danger");
+
+		if(is_string($options)) {
+			$style 		= $options;
+			$options	= [];
+		} else {
+			$style 		= (isset($options['style'])) ? $options['style'] : 'default';
+		}
+
+		$class 			.= (in_array($style, $valid_style)) ? " label-{$style}" : " label-default";
 		
 		if (isset($options["class"]) && !empty($options["class"])) {
 			$options["class"] = $class . " " . $options["class"];
@@ -117,6 +124,10 @@ class BootstrapHelper extends AppHelper {
 	 * @return void
 	 */
 	public function icon($name, $options = array()) {
+		if(is_array($name)) {
+			if(isset($name[1])) $options = $name[1];
+			$name = $name[0];
+		}
 		$class = " glyphicon icon-{$name} ";
 		if(!is_array($options)) $options = array();
 		
@@ -140,8 +151,11 @@ class BootstrapHelper extends AppHelper {
 		$close = "";
 		if (isset($options['closable']) && $options['closable']) {
 			$close = '<a class="close" data-dismiss="alert">&times;</a>';
+			unset($options['closable']);
 		}
 		$style = isset($options["style"]) ? $options["style"] : "warning";
+		unset($options['style']);
+
 		$types = array("info", "success", "danger", "warning");
 		if ($style === "flash") {
 			$style = "warning";
@@ -149,15 +163,19 @@ class BootstrapHelper extends AppHelper {
 		if (strtolower($style) === "auth") {
 			$style = "error";
 		}
+
+		if(!isset($options['class'])) $options['class'] = '';
+
 		if (!in_array($style, array_merge($types, array("auth", "flash")))) {
-			$class = "alert alert-warning {$style}";
+			$options['class'] .= " alert alert-warning {$style}";
 		} else {
-			$class = "alert alert-{$style}";
+			$options['class'] .= " alert alert-{$style}";
 		}
+		
 		return $this->Html->tag(
 			'div',
 			"{$close}{$content}",
-			array("class" => $class)
+			$options
 		);
 	}
 
@@ -217,6 +235,42 @@ class BootstrapHelper extends AppHelper {
 			CakeSession::delete('Message.' . $key);
 		}
 		return $out;
+	}
+
+
+	public function col($options = array(), $content = null) {
+		$validSize 		= ['xs', 'sm', 'md', 'lg'];
+		$validOffset	= ['xs-offset', 'sm-offset', 'md-offset', 'lg-offset'];
+		if(is_array($options)) {
+
+			if(!isset($options['class'])) $options['class'] = '';
+
+			foreach ($options as $key => $value) {
+				if(in_array($key, $validSize)) {
+					if(in_array($value, range(1, 12))) $options['class'] .= ' col-'.$key.'-'.$value;
+					unset($options[$key]);
+				}
+				
+				if(in_array($key, $validOffset)) {
+					if(in_array($value, range(0, 11))) $options['class'] .= ' col-'.$key.'-'.$value;
+					unset($options[$key]);
+				}
+			}
+
+			return $this->Html->tag('div', $content, $options);
+		} else {
+			return $this->Html->tag('/div');
+		}
+	}
+
+	public function row($options = array(), $content = null) {
+		if(is_array($options)) {
+			if(!isset($options['class'])) $options['class'] = '';
+			$options['class'] .= ' row';
+			return $this->Html->tag('div', $content, $options);
+		} else {
+			return $this->Html->tag('/div');
+		}
 	}
 
 }

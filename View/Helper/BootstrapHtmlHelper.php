@@ -4,6 +4,48 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
 
     public $helpers = array("Html", "TwitterBootstrap.Bootstrap", "TwitterBootstrap.BootstrapForm", "Form");
 
+    public $angularjs = true;
+
+    public function link($title = '', $url = null, $options = array(), $confirmMessage = false) {
+        $escapeTitle = true;
+        if ($url !== null) {
+            $url = $this->url($url);
+        }
+
+        if (isset($options['escape'])) {
+            $escapeTitle = $options['escape'];
+        }
+
+        if ($escapeTitle === true) {
+            $title = h($title);
+        } elseif (is_string($escapeTitle)) {
+            $title = htmlentities($title, ENT_QUOTES, $escapeTitle);
+        }
+
+        if (!empty($options['confirm'])) {
+            $confirmMessage = $options['confirm'];
+            unset($options['confirm']);
+        }
+        if ($confirmMessage) {
+            $confirmMessage = str_replace("'", "\'", $confirmMessage);
+            $confirmMessage = str_replace('"', '\"', $confirmMessage);
+            $options['onclick'] = "return confirm('{$confirmMessage}');";
+        } elseif (isset($options['default']) && $options['default'] == false) {
+            if (isset($options['onclick'])) {
+                $options['onclick'] .= ' event.returnValue = false; return false;';
+            } else {
+                $options['onclick'] = 'event.returnValue = false; return false;';
+            }
+            unset($options['default']);
+        }
+
+        if($url !== null) {
+            return sprintf('<a href="%s"%s>%s</a>', $url, $this->_parseAttributes($options), $title);
+        } else {
+            return sprintf('<a %s>%s</a>', $this->_parseAttributes($options), $title);
+        }
+    }
+
     /**
      * Arma un botón a aprtir sólo del array
      * de opciones
@@ -19,7 +61,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
     
     protected function _linkFromArray($button, $type = 'link') {
         list($title, $url, $opts, $confirm, $type) = $this->_parseLinkArray($button, $type);
-        $button = ($type == 'link') ? $this->Html->link($title, $url, $opts, $confirm) : $this->Form->postLink($title, $url, $opts, $confirm);
+        $button = ($type == 'link') ? $this->link($title, $url, $opts, $confirm) : $this->Form->postLink($title, $url, $opts, $confirm);
         return $button;
     }
     
@@ -67,48 +109,74 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
     
     /**
      * Bootstrap 3.0 panels
+     * ### Options: 
+     * 
+     * - 'class' - Aditional classes for the panel, in adittion to "panel" class. Must be space separated
+     * - 'buttons' - Array with LINK_ARRAYs, DROPDOWN_ARRAY, array('html' => HTML) for pure html, 
+     *    array() will make a separator
+     * - 'label' => array with LABEL_ARRAYs
+     * - 'icon' => ICON_ARRAY
+     * - 'title' => Title for the panel-heading
+     * - 'padding' - boolean Define if "nopadding" class should be added to panel-body. Default is false.
+     *  Any other key passed to $options will be treated as HTML tag Attribute. 
+     *  For example, if using Angular.js, you may pass this inside $options array:
+     *  'ng-controller' => 'MyCotnroller' or 'id' => 'thisPanelsID'
+     *      
      * @param array $options
      */
-    public function start_panel($options = array()){
+    public function start_panel($options = array()) {
+        $default_options = array(
+            'class' => 'panel ',
+            'style' => 'default',
+            'buttons' => array(),
+            'icon' => null,
+            'padding' => true,
+            'title' => '',
+            'label' => null,
+        );
         $html = ' ';
-        $panel_class = array();
-        $panel_body_class = array();
-        $panel_body_class[] = (isset($options['padding']) && $options['padding']) ? '' : 'nopadding';
-        
         $valid_styles = array(
             'primary', 'success', 'warning', 'info', 'danger', 'default'
         );
         
+        /** Parse options that should be treated before array_merge **/
+        if(!isset($options['class'])) $options['class'] = '';
+        $options['class'] = $default_options['class'] . $options['class'];
+
+        /** array_merge options **/
+        $options = array_merge($default_options, $options);
         
-        if(isset($options['class']) && !empty($options['class'])) {
-            $panel_class[] = $options['class'];
-        } else {
-            $panel_class[] = "panel-default";
+        if(in_array($options['style'], $valid_styles)) {
+            $options['class'] .= ' panel-' . $options['style'];
         }
         
-        if(isset($options['style']) && in_array($options['style'], $valid_styles)) {
-            $panel_class[] = 'panel-' . $options['style'];
+        /** Substract keys that are not in default array to treat as 
+          * HTML attributes 
+          */
+        $panel_attributes = array();
+        foreach ($options as $key => $value) {
+            if(!in_array($key, array_keys($default_options))) {
+                $panel_attributes[$key] = $value;
+                unset($options[$key]);
+            }
         }
-        
-        if(!isset($options['id'])) {
-            $html .= '<div class="panel '. implode(' ', $panel_class) .'"><div class="panel-heading">';
-        } else {
-            $html .= '<div id="'.$options['id'].'" class="panel '. implode(' ', $panel_class) .'"><div class="panel-heading">';
-        }
-    
-    
+        $panel_attributes['class'] = $options['class'];
+
+
+        $html .= $this->Html->tag('div', null, $panel_attributes);
+        $html .= $this->Html->tag('div', null, array('class' => 'panel-heading'));
+
         // PANEL HEADING
         $title = '';
         
         /**
          * Panel Icon (pull-left)
          */
-        if(isset($options['icon'])) {
+        if($options['icon'] !== null) {
             if(is_array($options['icon'])) {
-                $icon_options = isset($options['icon'][1]) ? $options['icon'][1] : array();
-                $title .= '<span class="icon">' . $this->Bootstrap->icon($options['icon'][0], $icon_options) . '</span>';
+                $title .= $this->Html->tag('span', $this->Bootstrap->icon($options['icon']), array('class' => 'icon'));
             } else {
-                $title .= '<span class="icon">' . $options['icon'] . '</span>';
+                $title .= $this->Html->tag('span', $options['icon'], array('class' => 'icon'));
             }
         }
         
@@ -173,8 +241,9 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         $html .= '</div>';
         
         // PANEL BODY:
-        
-        $html .= '<div class="panel-body '.implode(' ', $panel_body_class).'">';
+
+        $panel_body_class = ($options['padding'] === true) ? '' : 'nopadding';
+        $html .= '<div class="panel-body '. $panel_body_class.'">';
         
         return $html;
     }
@@ -183,6 +252,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         if(!isset($options['class'])) $options['class'] = '';
 
         if(!strpos($options['class'], 'panel-footer')) $options['class'] .= ' panel-footer';
+
         return "</div>" . $this->Html->tag('div', null, $options);
     }
     
@@ -223,7 +293,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         } elseif(isset($options['first']['title'])) {
             $buttonArray = array(
                 $options['first']['title'],
-                '#',
+                null,
                 array(
                     'style' => $style,
                     'size' => $size,
@@ -231,7 +301,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
             );
             $type = 'link';
         } else {
-            $buttonArray = array(array('text' => ''), '#', array('style' => $style, 'size' => $size));
+            $buttonArray = array(array('text' => ''), null, array('style' => $style, 'size' => $size));
             $type = 'link';
         }
         
@@ -239,19 +309,24 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         if(!$split){
             $buttonArray[0]['text'] .= '&nbsp;' . $this->Html->tag('span', '', array('class' => 'caret'));
             $buttonArray[2]['class'] = (isset($buttonArray[2]['class'])) ? $buttonArray[2]['class'] . ' dropdown-toggle' : 'dropdown-toggle';
-            $buttonArray[2]['data-toggle'] = 'dropdown'; 
+            if(!$this->angularjs || $navbar === false) $buttonArray[2]['data-toggle'] = 'dropdown'; 
         }
         
         $button = ($navbar === false) ? $this->_buttonFromArray($buttonArray, $type) : $this->_linkFromArray($buttonArray, $type);
         
         if($split) {
+            $caretOptions = [];
             $caretClasses = array(
                 'btn',
                 'dropdown-toggle',
             );
             if($style) array_push($caretClasses, 'btn-'.$style); else array_push($caretClasses, 'btn-default');
             if($size) array_push($caretClasses, 'btn-'.$size);
-            $button .= '<button class="'.implode(' ', $caretClasses).'" data-toggle="dropdown"><span class="caret"></span></button>';
+            $caretOptions['class'] = implode(' ', $caretClasses);
+            if(!$this->angularjs) $caretOptions['data-toggle'] = 'dropdown';
+
+            $button .= $this->Html->tag('button', '<span class="caret"></span>', $caretOptions);
+            // $button .= '<button class="'.implode(' ', $caretClasses).'" data-toggle="dropdown"><span class="caret"></span></button>';
         }
         
         //Dropdown links:
@@ -259,7 +334,12 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         
         foreach($options['links'] as $link) {
             if(is_array($link)){
-                $link_li .= (!empty($link)) ? $this->Html->tag('li', $this->_linkFromArray($link)) : $this->Html->tag('li', '', array('class' => 'divider'));
+                if(isset($link['header'])) {
+                    $link       = $link['header'];
+                    $link_li    .= (!empty($link)) ? $this->Html->tag('li', $this->_parseLinkArray($link)[0], ['class' => 'dropdown-header']) : $this->Html->tag('li', '', array('class' => 'divider'));
+                } else {
+                    $link_li .= (!empty($link)) ? $this->Html->tag('li', $this->_linkFromArray($link)) : $this->Html->tag('li', '', array('class' => 'divider'));
+                }
             } else {
                 $link_li .= $this->Html->tag('li', $link);
             }
@@ -298,7 +378,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
      */
     public function buttonLink($title, $url, $opt = array(), $confirm = false) {
         $opt = $this->buttonOptions($opt);
-        return $this->Html->link($title, $url, $opt, $confirm);
+        return $this->link($title, $url, $opt, $confirm);
     }
 
     /**
@@ -411,7 +491,7 @@ class BootstrapHtmlHelper extends TwitterBootstrapHelper {
         /**
          * HEADER
          */
-        $brand = (is_array($options['brand'])) ? $this->Html->link($options['brand']['title'], $options['brand']['href'], array('class' => 'navbar-brand')) : '';
+        $brand = (is_array($options['brand'])) ? $this->link($options['brand']['title'], $options['brand']['href'], ['class' => 'navbar-brand', 'escape' => false]) : $options['brand'];
         if($options['collapsable'] === false) {
             $header = '';
         } else {
@@ -475,7 +555,7 @@ EOT;
                     unset($button['li_id']);
                 }
                 $button['navbar'] = true;
-                $buttons_html .= $this->Html->tag('li', $this->_fillDropdown($button), array('class' => 'dropdown', 'id' => $id));
+                $buttons_html .= $this->Html->tag('li', $this->_fillDropdown($button), array('class' => 'dropdown', 'id' => $id, 'navbar' => true));
             } elseif(isset($button['html'])) {
                 $buttons_html .= $button['html'];
             } else {

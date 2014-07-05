@@ -70,6 +70,7 @@ class TwitterBootstrapHelper extends AppHelper {
 		if(is_array($title) && isset($title['post']) || isset($title['link'])) {
 			return $this->BootstrapHtml->_buttonFromArray($title);
 		} else {
+			if(is_array($title)) return $this->BootstrapHtml->_buttonFromArray($title);
 			return $this->BootstrapHtml->_buttonFromArray(array($title, $url, $opt, $confirm, $type));
 		}
 	}
@@ -86,8 +87,8 @@ class TwitterBootstrapHelper extends AppHelper {
 		return $this->BootstrapHtml->breadcrumbs();
 	}
 
-	public function label($message = "", $style = "", $options = array()) {
-		return $this->Bootstrap->label($message, $style, $options);
+	public function label($message = "", $options = array()) {
+		return $this->Bootstrap->label($message, $options);
 	}
 
 	public function badge($title = '0', $options = array()) {
@@ -124,6 +125,7 @@ class TwitterBootstrapHelper extends AppHelper {
 	
 	public function start_panel_footer($options = array()) {
 		return $this->BootstrapHtml->start_panel_footer($options);
+	}
 	
 	public function end_panel($options = array()) {
 		return $this->BootstrapHtml->end_panel($options);
@@ -143,5 +145,17 @@ class TwitterBootstrapHelper extends AppHelper {
 	
 	public function nav($options = array()) {
 		 return $this->BootstrapHtml->nav($options);
+	}
+
+	public function row($options = array(), $content = null) {
+		return $this->Bootstrap->row($options, $content);
+	} 
+
+	public function col($options = array(), $content = null) {
+		return $this->Bootstrap->col($options, $content);
+	}
+
+	public function link($title = '', $url = null, $options = array(), $confirm = null) {
+		return $this->BootstrapHtml->link($title, $url, $options, $confirm);
 	}
 }

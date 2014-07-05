@@ -1,20 +1,46 @@
+/**
+ * Panels
+ */
 .panel .panel-heading .icon {
     margin-right: 10px;
 }
-
-.panel .btn-group {
+.panel .panel-heading .btn-group {
     top: -5px;
     margin-right: 5px;
 }
+.nopadding {
+    padding: 0px;
+}
 
+/** 
+ * Fixes
+ */
 input[type="checkbox"], input[type="radio"] {
     height: 15px;
 }
 
+.navbar a {
+    cursor: pointer;
+}
+
+.dropdown-menu a,
+.btn {
+    cursor: default;
+}
 
 /* For fixed navbar uncomment:  */
 
 
-/*body {
-    padding-top: 70px;
-}*/
+body {
+    padding-top: 50px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 8px;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
