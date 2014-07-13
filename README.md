@@ -70,16 +70,6 @@ public $helpers = array(
 
 Simply copy `webroot`'s folder contents to app/webroot.
 
-Alternatively, if you're using a POSIX server, you may soft-link
-On your `app` folder:
-
-```
-$ ln -s Plugins/TwitterBootstrap/webroot/js/bootstrap.min.js webroot/js/
-$ ln -s Plugins/TwitterBootstrap/webroot/css/bootstrap.min.css webroot/css/
-$ ln -s Plugins/TwitterBootstrap/webroot/css/font-awesome.min.css webroot/css/
-$ ln -s $ ln -s Plugins/TwitterBootstrap/webroot/font webroot/
-```
-
 Then add the scripts and css to the Layout:
 
 ```
@@ -88,6 +78,18 @@ Then add the scripts and css to the Layout:
         echo $this->Html->css('custom');
 
         echo $this->Html->script('bootstrap.min');
+```
+
+### OR
+
+Load them from the plugin: 
+
+```
+  echo $this->Html->css('TwitterBootstrap/bootstrap.min');
+  echo $this->Html->css('TwitterBootstrap/font-awesome.min');
+  echo $this->Html->css('TwitterBootstrap/custom');
+  
+  echo $this->Html->script('TwitterBootstrap/bootstrap.min');
 ```
 
 ## Configuration arrays
